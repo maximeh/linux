@@ -227,7 +227,8 @@ dtb-$(CONFIG_MACH_KIRKWOOD) += \
 	kirkwood-ts219-6281.dtb \
 	kirkwood-ts219-6282.dtb \
 	kirkwood-ts419-6281.dtb \
-	kirkwood-ts419-6282.dtb
+	kirkwood-ts419-6282.dtb \
+	kirkwood-wireless-space.dtb
 dtb-$(CONFIG_ARCH_LPC18XX) += \
 	lpc4337-ciaa.dtb \
 	lpc4350-hitex-eval.dtb \
