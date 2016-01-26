@@ -48,10 +48,12 @@
 			 * 0x50     | HT24LC04     | eeprom (512B)
 			 */
 			status = "okay";
+
 			lm77@49 {
 				compatible = "national,lm77";
 				reg = <0x49>;
 			};
+
 			eeprom@50 {
 				compatible = "atmel,24c04";
 				pagesize = <16>;
@@ -60,7 +62,6 @@
 		};
 
 		serial@12000 {
-			clock-frequency = <200000000>;
 			status = "okay";
 		};
 
@@ -119,12 +120,13 @@
 		#address-cells = <2>;
 		#size-cells = <0>;
 
-		dsa,ethernet = <&eth0>;
+		dsa,ethernet = <&eth0port>;
 		dsa,mii-bus = <&mdio>;
 
 		switch@0 {
 			#address-cells = <1>;
 			#size-cells = <0>;
+			reg = <0 0>; /* MDIO address 0, switch 0 in tree */
 
 			port@0 {
 				reg = <0>;
@@ -146,8 +148,8 @@
 				label = "lan4";
 			};
 
-			port@5 {
-				reg = <5>;
+			port@4 {
+				reg = <4>;
 				label = "cpu";
 			};
 		};
@@ -157,27 +159,30 @@
 		compatible = "gpio-keys";
 		#address-cells = <1>;
 		#size-cells = <0>;
-		button@1 {
+
+		button@0 {
 			label = "Rear power push button";
 			linux,code = <KEY_POWER>;
 			gpios = <&gpio0 13 GPIO_ACTIVE_HIGH>;
 			debounce-interval = <5>;
 		};
-		button@2{
+		button@1{
 			label = "Front WPS button";
 			linux,code = <KEY_WLAN>;
 			gpios = <&gpio1 12 GPIO_ACTIVE_LOW>;
 			debounce-interval = <5>;
 		};
+
 	};
 
-	gpio_poweroff {
+	gpio-poweroff {
 		compatible = "gpio-poweroff";
 		gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
 	};
 
 	gpio-leds {
 		compatible = "gpio-leds";
+
 		red-front {
 			label = "ws:red:power";
 			gpios = <&gpio0 12 GPIO_ACTIVE_HIGH>;
@@ -192,6 +197,7 @@
 			gpios = <&gpio0 16 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "ide-disk";
 		};
+
 	};
 
 	regulators {
@@ -212,6 +218,7 @@
 			regulator-boot-on;
 			gpio = <&gpio1 9 GPIO_ACTIVE_HIGH>;
 		};
+
 		regulator@2 {
 			compatible = "regulator-fixed";
 			reg = <2>;
@@ -247,22 +254,34 @@
 
 	partition@1500000 {
 		label = "root";
-		reg = <0x02500000 0x6b00000>; /* 107MB */
+		reg = <0x01500000 0x6b00000>; /* 107MB */
 	};
 };
 
 &mdio {
 	status = "okay";
 
-	ethphy0: ethernet-phy@0 {
-		device_type = "ethernet-phy";
-		reg = <0>;
-	};
+	/* ethphy0: ethernet-phy@0 { */
+		/* device_type = "ethernet-phy"; */
+		/* reg = <0>; */
+	/* }; */
 };
 
+/* &eth0 { */
+/* 	status = "okay"; */
+/* 	ethernet0-port@0 { */
+/* 		phy-handle = <&ethphy0>; */
+/* 	}; */
+/* }; */
+
+
+/* eth0 is connected to a Marvell 88E6171 switch, without a PHY. So set
+ * fixed speed and duplex. */
 &eth0 {
-	status = "okay";
-	ethernet0-port@0 {
-		phy-handle = <&ethphy0>;
-	};
+    status = "okay";
+
+    ethernet0-port@0 {
+        speed = <1000>;
+        duplex = <1>;
+    };
 };
